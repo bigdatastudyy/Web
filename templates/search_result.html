@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% block title %}검색 결과{% endblock title %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/searchbar.css') }}">
+    <style>
+        #local-section{
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        svg {
+            top:0px;
+        }
+
+        svg text {
+          pointer-events: none;
+        }
+        svg .municipality {
+          fill: #1d639f;
+          stroke: #fff;
+        }
+        svg .municipality-label {
+          fill: white;
+          font-size: 12px;
+          font-weight: 300;
+          text-anchor: middle;
+        }
+        svg #map text {
+          color: #333;
+          font-size: 12px;
+          text-anchor: middle;
+          font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        path:hover{
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        path.link {
+        fill: none;
+        stroke-width: 2px;
+        }
+    </style>
+{% endblock style %}
+
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+      <h1 class="display-4 mb-4">검색 결과</h1>
+      <form action="{{ url_for('search_page') }}" method="post">
+         <div class="container h-100" >
+          <div class="d-flex justify-content-center h-100">
+            <div class="searchbar" >
+              <input id=input_text class="search_input" name='search' type="text" placeholder="민원을 입력해주세요! (2자 이상)" >
+              <input class="search_text" type="image" src="/static/images/search_icon.png"  >
+              <script>
+                var input = document.getElementById("input_text");
+                input.addEventListener("keyup", function(event) {
+                  if (event.keyCode === 13) {
+                   event.preventDefault();
+                   document.getElementById("search_button").click();
+                  }
+                });
+               </script>
+            </div>
+          </div>
+            </div>
+        </form>
+    </div>
+    <div class="container-fluid">
+        <div id="minwon-list" class="carousel slide" data-ride="carousel" style="padding-left:12%;padding-right:12%", data-interval="false">
+            <div class="carousel-inner">
+            {% if opinions %}
+                {% for op in opinions %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <div class="card-deck mb-3 ml-1 mr-1">
+                            {%  for o in op %}
+                                <div class="card" style="width: 18rem;" data-toggle="modal" data-target="#result-detail">
+                                      <div class="card-header">
+                                          <h5 style="margin-bottom:0;">
+                                              <a href="{{ url_for('search_detail', index=o.index) }}">
+                                              {{o.title}}
+                                              </a>
+                                          </h5>
+                                      </div>
+                                      <ul class="list-group list-group-flush">
+                                        <li id="question-card" class="list-group-item">{{o.question|safe}}</li>
+                                        <li id="answer-card" class="list-group-item">{{o.ans|safe}}</li>
+                                      </ul>
+                                      <div class="card-footer text-right">
+                                        <small class="text-muted">{{o.part}}</small>
+                                      </div>
+                                    </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {%  endfor %}
+            {% else %}
+                    ----------------- 검색 결과 없을 때 처리 ----------------
+            {% endif %}
+            </div>
+            <a class="carousel-control-prev" href="#minwon-list" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#minwon-list" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+
+        <div id="local-section" class="d-flex justify-content-center mb-4">
+            <div class="card-deck">
+                 <div id="local-map" class="card text-center" style="min-width:510px">
+                     <div class="card-header">
+                         <h2>발생 지역</h2>
+                     </div>
+                     <div class="card-body">
+                         <div id="chart"></div>
+                     </div>
+                 </div>
+                 <div id="local-keywords" class="card text-center" style="min-width:510px">
+                     <div class="card-header">
+                         <h2>지역별 키워드</h2>
+                     </div>
+                     <div class="card-body" style="padding:0rem;">
+                         <div id="region_name">
+                             <h4></h4>
+                         </div>
+                         <div id="vis"></div>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div></div>
+
+    <div id="result-detail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="resultDetail" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title"></h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p id="question-modal"></p>
+                  <hr>
+                  <p id="answer-modal"></p>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+
+
+
+
+{% endblock content %}
+
+{% block script %}
+    <script>
+      //modal 관련 함수 정의하는 부분
+    </script>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script type="text/javascript" src="http://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js" charset="UTF-8"></script>
+    <script>
+        var width = 510,
+            height = 400;
+        var svg = d3.select("#chart").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        var map = svg.append("g").attr("id", "map");
+        var projection = d3.geo.mercator()
+            .center([126.9895, 37.5651])
+            .scale(60000)
+            .translate([width/2, height/2]);
+        var path = d3.geo.path().projection(projection);
+        d3.json("{{url_for('static', filename='seoul_municipalities_topo_simple.json')}}", function (error, data) {
+            var features = topojson.feature(data, data.objects.seoul_municipalities_geo).features;
+            map.selectAll("path")
+                .data(features)
+                .enter().append("path")
+                .attr("class", function (d) {
+                    console.log();
+                    return "municipality c" + d.properties.code
+                })
+                .attr("d", path)
+                .on("click", function(d){
+                    var name = [d.properties.name];
+
+                    d3.select("#local-keywords .card-header h2")
+                        .data(name)
+                        .text(function(d){
+                            return d + " 키워드";
+                        })
+
+                    keyword(name);
+
+                    d3.selectAll("path")
+                        .attr({
+                            opacity:1
+                        })
+
+                    d3.select(this)
+                        .attr({
+                            opacity:0.6
+                        })
+                })
+
+
+            map.selectAll("text")
+                .data(features)
+                .enter().append("text")
+                .attr("transform", function (d) {
+                    return "translate(" + path.centroid(d) + ")";
+                })
+                .attr("dy", ".35em")
+                .attr("class", "municipality-label")
+                .text(function (d) {
+                    return d.properties.name;
+                })
+
+        });
+
+        function keyword(name) {// some colour variables
+            d3.select("#vis > *").remove();
+
+            var tcBlack = "#130C0E";
+
+            // rest of vars
+            var w = 510,
+                h = 400,
+                maxNodeSize = 50,
+                x_browser = 0,
+                y_browser = 0,
+                root;
+
+            var vis;
+            var force = d3.layout.force();
+
+            vis = d3.select("#vis").append("svg").attr("width", w).attr("height", h);
+
+            d3.json("{{ url_for('static', filename='keyword_example.json') }}", function (json) {
+
+                root = json;
+                root.name=name;
+                root.fixed = true;
+                root.x = w / 2;
+                root.y = h / 2;
+
+                // Build the path
+                var defs = vis.insert("svg:defs")
+                    .data(["end"]);
+
+
+                defs.enter().append("svg:path")
+                    .attr("d", "M0,-5L10,0L0,5");
+
+                update();
+            });
+
+
+            function update() {
+                var nodes = flatten(root),
+                    links = d3.layout.tree().links(nodes);
+
+                // Restart the force layout.
+                force.nodes(nodes)
+                    .links(links)
+                    .gravity(0.05)
+                    .charge(-1500)
+                    .linkDistance(150)
+                    .friction(0.5)
+                    .linkStrength(function (l, i) {
+                        return 1;
+                    })
+                    .size([w, h])
+                    .on("tick", tick)
+                    .start();
+
+                var path = vis.selectAll("path.link")
+                    .data(links, function (d) {
+                        return d.target.id;
+                    });
+
+                path.enter().insert("svg:path")
+                    .attr("class", "link")
+                    // .attr("marker-end", "url(#end)")
+                    .style("stroke", "#eee");
+
+
+                // Exit any old paths.
+                path.exit().remove();
+
+
+                // Update the nodes…
+                var node = vis.selectAll("g.node")
+                    .data(nodes, function (d) {
+                        return d.id;
+                    });
+
+
+                // Enter any new nodes.
+                var nodeEnter = node.enter().append("svg:g")
+                    .attr("class", "node")
+                    .attr("transform", function (d) {
+                        return "translate(" + d.x + "," + d.y + ")";
+                    })
+                    .call(force.drag);
+
+                // Append a circle
+                nodeEnter.append("svg:circle")
+                    .attr("r", function (d) {
+                        return d.count * 10 || 40;
+                    })
+                    .style("fill", "#eee");
+
+
+                nodeEnter.append("text")
+                    .attr("class", "nodetext")
+                    .attr("fill", tcBlack)
+                    .text(function (d) {
+                        return d.keyword || d.name;
+                    });
+
+
+                // Exit any old nodes.
+                node.exit().remove();
+
+
+                // Re-select for update.
+                path = vis.selectAll("path.link");
+                node = vis.selectAll("g.node");
+
+                function tick() {
+
+
+                    path.attr("d", function (d) {
+
+                        var dx = d.target.x - d.source.x,
+                            dy = d.target.y - d.source.y,
+                            dr = Math.sqrt(dx * dx + dy * dy);
+                        return "M" + d.source.x + ","
+                            + d.source.y
+                            + "A" + dr + ","
+                            + dr + " 0 0,1 "
+                            + d.target.x + ","
+                            + d.target.y;
+                    });
+                    node.attr("transform", nodeTransform);
+                }
+            }
+
+
+            /**
+             * Gives the coordinates of the border for keeping the nodes inside a frame
+             * http://bl.ocks.org/mbostock/1129492
+             */
+            function nodeTransform(d) {
+                d.x = Math.max(maxNodeSize, Math.min(w - (d.imgwidth / 2 || 16), d.x));
+                d.y = Math.max(maxNodeSize, Math.min(h - (d.imgheight / 2 || 16), d.y));
+                return "translate(" + d.x + "," + d.y + ")";
+            }
+
+
+            /**
+             * Returns a list of all nodes under the root.
+             */
+            function flatten(root) {
+                var nodes = [];
+                var i = 0;
+
+                function recurse(node) {
+                    if (node.children)
+                        node.children.forEach(recurse);
+                    if (!node.id)
+                        node.id = ++i;
+                    nodes.push(node);
+                }
+
+                recurse(root);
+                return nodes;
+            }
+        }
+    </script>
+{% endblock %}

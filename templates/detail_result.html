@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}상세 결과{% endblock title %}
+
+{% block content %}
+    <main role="main" class="container">
+
+      <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h5 class="border-bottom border-gray pb-2 mb-0">{{opinion.title}}</h5>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 small lh-125">
+            {{opinion.question|safe}}
+          </p>
+        </div>
+      </div>
+
+      <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h5 class="border-bottom border-gray pb-2 mb-0">답변</h5>
+        <div class="media text-muted pt-3">
+          <p class="media-body pb-3 mb-0 small lh-125">
+            {{opinion.ans|safe}}
+          </p>
+        </div>
+      </div>
+    </main>
+
+{% endblock content %}
