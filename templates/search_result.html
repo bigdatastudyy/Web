@@ -78,12 +78,10 @@
                     <div class="carousel-item {% if loop.first %}active{% endif %}">
                         <div class="card-deck mb-3 ml-1 mr-1">
                             {%  for o in op %}
-                                <div class="card" style="width: 18rem;" data-toggle="modal" data-target="#result-detail">
+                                <div class="card" style="width:18rem;cursor:pointer;max-width:249.99px;" onclick="location.href='{{ url_for('search_detail', index=o.index) }}'; ">
                                       <div class="card-header">
                                           <h5 style="margin-bottom:0;">
-                                              <a href="{{ url_for('search_detail', index=o.index) }}">
                                               {{o.title}}
-                                              </a>
                                           </h5>
                                       </div>
                                       <ul class="list-group list-group-flush">
@@ -136,38 +134,9 @@
             </div>
         </div>
     </div>
-
-    <div></div>
-
-    <div id="result-detail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="resultDetail" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title"></h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-              <div class="modal-body">
-                  <p id="question-modal"></p>
-                  <hr>
-                  <p id="answer-modal"></p>
-              </div>
-          </div>
-      </div>
-    </div>
-
-
-
-
-
-
 {% endblock content %}
 
 {% block script %}
-    <script>
-      //modal 관련 함수 정의하는 부분
-    </script>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://d3js.org/topojson.v1.min.js"></script>

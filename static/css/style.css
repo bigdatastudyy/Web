@@ -1,5 +1,6 @@
 html {
     font-family: 'Nanum Myeongjo', serif;
+    background-color:#eee;
 }
 
 .card {
@@ -19,7 +20,7 @@ html {
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 2; /* number of lines to show */
    line-height: 18px;        /* fallback */
-   max-height: 63px;       /* fallback */
+   height: 63px;       /* fallback */
 }
 
 .list-group-item {
@@ -27,13 +28,20 @@ html {
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 3; /* number of lines to show */
+   -webkit-line-clamp: 4; /* number of lines to show */
    line-height: 25px;        /* fallback */
-   max-height: 93px;       /* fallback */
+   height: 117px;       /* fallback */
 }
 
 .card-footer {
     padding: .5rem .8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-height: 25px;
+    height: 40px;
 }
 
 .carousel-control-next, .carousel-control-prev {
