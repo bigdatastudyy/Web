@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, jsonify
 from models import db, whooshee, Minwon
 import pandas as pd
 import sqlalchemy as sql
@@ -46,6 +46,15 @@ def search_page():
         return render_template('search_result.html', opinions=final,search=search,c=c,d=d)
     else:
         abort(403)
+
+
+@app.route('/monthly_data', methods=["POST"])
+def get_monthly_data():
+    if request.method == "POST":
+        name = request.form.get("name")
+        search = request.form.get("search")
+
+        return str(monthly_topic_stats(a, name, set_query_topic(search)))
 
 
 @app.route('/detail_result/<index>')

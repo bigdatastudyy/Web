@@ -54,7 +54,7 @@
          <div class="container h-100" >
           <div class="d-flex justify-content-center h-100">
             <div class="searchbar" >
-              <input id=input_text class="search_input" name='search' type="text" placeholder="민원을 입력해주세요! (2자 이상)" >
+              <input id=input_text class="search_input" name='search' type="text" placeholder="{{ search }}" >
               <input class="search_text" type="image" src="/static/images/search_icon.png"  >
               <script>
                 var input = document.getElementById("input_text");
@@ -114,7 +114,7 @@
             <div class="card-deck">
                  <div id="local-map" class="card text-center" style="min-width:510px">
                      <div class="card-header">
-                         <h2>관련 민원 발생 지역</h2>
+                         <h2></h2>
                      </div>
                      <div class="card-body">
                          <div id="chart"></div>
@@ -125,10 +125,7 @@
                          <h2>1년간 지역별 추이</h2>
                      </div>
                      <div class="card-body" style="padding:0rem;">
-                         <div id="region_name">
-                             <h4></h4>
-                         </div>
-                         <div id="vis"></div>
+
                      </div>
                  </div>
             </div>
@@ -144,6 +141,7 @@
     <script src="https://d3js.org/d3-color.v1.min.js"></script>
     <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.0.0.js"></script>
     <script>
         var width = 510,
             height = 400;
@@ -177,6 +175,20 @@
                             return "1년간 " + d + " 추이";
                         })
 
+                    $.ajax({
+                        url:"{{ url_for('get_monthly_data') }}",
+                        type:"POST",
+                        data:{
+                            "name":name,
+                            "search":"{{ search }}"
+                        },
+                        success:function(response){
+
+                        }
+                    })
+
+
+
                     d3.selectAll("path")
                         .attr({
                             opacity:1
@@ -204,7 +216,14 @@
             map.selectAll(".municipality")
                 .data(features)
                 .style("fill", function(d){
+                    var topic = {{ c|safe }}.topicName;
                     var rates = {{ c|safe }}.result;
+
+                    d3.select("#local-map h2")
+                        .data([topic])
+                        .text(function(d){
+                            return d + " 관련 민원 발생 지역";
+                        })
 
                     for(var i=0; i < rates.length; i++){
                         if(rates[i].name == d.properties.name){
