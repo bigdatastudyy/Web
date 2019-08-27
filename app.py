@@ -2,12 +2,7 @@ from flask import Flask, render_template, request, abort
 from models import db, whooshee, Minwon
 import pandas as pd
 import sqlalchemy as sql
-from minwon_search import set_query_topic,district_stats
-import dash
-from dash.dependencies import Input, Output
-import dash_html_components as html
-import dash_core_components as dcc
-from dash1 import graph
+from minwon_search import set_query_topic,district_stats,monthly_topic_stats
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final_data.db'
@@ -44,7 +39,11 @@ def search_page():
         minwons = Minwon.query.whooshee_search(search, limit=900).order_by(Minwon.ans_date.desc()).all()
         n = 4
         final = [minwons[i * n:(i + 1) * n] for i in range((len(minwons) + n - 1) // n)]
-        return render_template('search_result.html', opinions=final,search=search)
+        # 지역 rate
+        c = district_stats(a,set_query_topic(search))
+        # 월별
+        d = monthly_topic_stats(a,'송파구',set_query_topic(search))
+        return render_template('search_result.html', opinions=final,search=search,c=c,d=d)
     else:
         abort(403)
 

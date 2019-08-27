@@ -159,6 +159,7 @@
         var path = d3.geo.path().projection(projection);
         d3.json("{{url_for('static', filename='seoul_municipalities_topo_simple.json')}}", function (error, data) {
             var features = topojson.feature(data, data.objects.seoul_municipalities_geo).features;
+
             map.selectAll("path")
                 .data(features)
                 .enter().append("path")
@@ -170,10 +171,12 @@
                 .on("click", function(d){
                     var name = [d.properties.name];
 
+
+
                     d3.select("#local-keywords .card-header h2")
                         .data(name)
                         .text(function(d){
-                            return d + " 키워드";
+                            return d + "";
                         })
 
                     d3.selectAll("path")
@@ -201,8 +204,15 @@
                 })
 
             map.selectAll(".municipality")
-                .style("fill", function(){
-                    return  d3.interpolateBlues(Math.random() * 0.7 + 0.3);
+                .data(features)
+                .style("fill", function(d){
+                    var rates = {{ c|safe }}.result;
+
+                    for(var i=0; i < rates.length; i++){
+                        if(rates[i].name == d.properties.name){
+                            return d3.interpolateBlues(rates[i].rate * 0.7 + 0.3);
+                        }
+                    }
                 })
 
         });
