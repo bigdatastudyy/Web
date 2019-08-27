@@ -3,8 +3,8 @@ body, html {
     width: 100%;
     margin: 0;
     padding: 0;
-    background: white !important;
     font-family: 'Noto Sans KR', sans-serif;
+    background-color:#f4f5f6;
 }
 
 
@@ -16,6 +16,10 @@ body, html {
     border: 1.5px solid #1d639f;
     padding: 7px;
     background-color:white;
+}
+
+.searchbar:hover {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 
