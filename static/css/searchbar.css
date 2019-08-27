@@ -4,6 +4,7 @@ body, html {
     margin: 0;
     padding: 0;
     background: white !important;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 
@@ -14,6 +15,7 @@ body, html {
     border-radius: 30px;
     border: 1.5px solid #1d639f;
     padding: 7px;
+    background-color:white;
 }
 
 

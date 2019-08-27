@@ -1,9 +1,9 @@
-html {
-    font-family: 'Nanum Myeongjo', serif;
-    background-color:#eee;
+body {
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 .card {
+    overflow:hidden;
 	border-radius: 15px;
 	display: inline-block;
 	margin-top: 30px;
