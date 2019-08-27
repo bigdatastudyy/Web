@@ -114,7 +114,7 @@
             <div class="card-deck">
                  <div id="local-map" class="card text-center" style="min-width:510px">
                      <div class="card-header">
-                         <h2>발생 지역</h2>
+                         <h2>관련 민원 발생 지역</h2>
                      </div>
                      <div class="card-body">
                          <div id="chart"></div>
@@ -169,14 +169,12 @@
                 })
                 .attr("d", path)
                 .on("click", function(d){
-                    var name = [d.properties.name];
-
-
+                    var name = d.properties.name;
 
                     d3.select("#local-keywords .card-header h2")
-                        .data(name)
+                        .data([name])
                         .text(function(d){
-                            return d + "";
+                            return "1년간 " + d + " 추이";
                         })
 
                     d3.selectAll("path")
