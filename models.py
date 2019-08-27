@@ -22,7 +22,7 @@ class Minwon(db.Model):
     ans = db.Column('ans', db.Text)
     collection = db.Column('collection',db.Text)
     controlled_collection = db.Column('controlled_collection',db.Text)
-    topic = db.Column('topic',db.Text)
+    topic = db.Column('topic',db.Integer)
 
     def __str__(self):
         return self.controlled_collection

@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, abort
 from models import db, whooshee, Minwon
-
+import pandas as pd
+import sqlalchemy as sql
+from minwon_search import set_query_topic,district_stats
+import dash
+from dash.dependencies import Input, Output
+import dash_html_components as html
+import dash_core_components as dcc
+from dash1 import graph
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final_data.db'
@@ -9,12 +16,22 @@ app.config['WHOOSHEE_MIN_STRING_LEN'] = 2
 db.init_app(app)
 whooshee.init_app(app)
 
+# 희석쓰
+sql_engine = sql.create_engine('sqlite:///final_data.db')
+data = pd.read_sql_table('minwon_table',sql_engine)
+data.date = pd.to_datetime(data.date)
+a = data[data.date > '2018-08-01']
+a.date = a.date.astype(str)
 
 @app.route('/')
 def index():
-    #whooshee.reindex()
+#    whooshee.reindex()
     return render_template('main.html')
 
+@app.route('/test')
+def test():
+    c = district_stats(a, set_query_topic('송파구 가로등 보수작업'))
+    return render_template('test.html',c=c)
 
 @app.route('/search_result', methods=['POST'])
 def search_page():
@@ -27,7 +44,7 @@ def search_page():
         minwons = Minwon.query.whooshee_search(search, limit=900).order_by(Minwon.ans_date.desc()).all()
         n = 4
         final = [minwons[i * n:(i + 1) * n] for i in range((len(minwons) + n - 1) // n)]
-        return render_template('search_result.html', opinions=final)
+        return render_template('search_result.html', opinions=final,search=search)
     else:
         abort(403)
 
