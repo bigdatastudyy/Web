@@ -1,8 +1,12 @@
 from flask import Flask, render_template, request, abort, jsonify
 from models import db, whooshee, Minwon
 import pandas as pd
+import numpy as np
+import json
 import sqlalchemy as sql
 from minwon_search import set_query_topic,district_stats,monthly_topic_stats
+import plotly
+import plotly.graph_objs as go
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final_data.db'
@@ -49,12 +53,21 @@ def search_page():
 
 
 @app.route('/monthly_data', methods=["POST"])
-def get_monthly_data():
+def draw_monthly_graph():
     if request.method == "POST":
         name = request.form.get("name")
         search = request.form.get("search")
 
-        return str(monthly_topic_stats(a, name, set_query_topic(search)))
+        dateList, totalList = monthly_topic_stats(a, name, set_query_topic(search))
+
+        # result = {"date":dateList, "total":totalList}
+        # json_result = json.dumps(result, indent="  ", ensure_ascii=False)
+
+        df = monthly_topic_stats(a, name, set_query_topic(search))
+
+        scatter = create_plot(df)
+
+    return scatter
 
 
 @app.route('/detail_result/<index>')
@@ -81,6 +94,20 @@ def interest():
 @app.route('/local')
 def local():
     return render_template('local.html')
+
+
+def create_plot(df):
+
+    data = [
+        go.Scatter(
+            x=df['date'],
+            y=df['total']
+        )
+    ]
+
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return graphJSON
 
 
 if __name__ == '__main__':

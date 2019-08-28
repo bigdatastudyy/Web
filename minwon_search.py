@@ -149,8 +149,11 @@ def monthly_topic_stats(data,district,topic):
 
     for df in monthlyDataFrames:
         totalResult.append(len([_ for _ in df.topic if _==topic]))
-        
-    return dateList,totalResult
+
+    result = {"date":dateList, "total":totalResult}
+    df = pd.DataFrame(result)
+    df.date = pd.to_datetime(df.date)
+    return df
 
 
 

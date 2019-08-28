@@ -125,7 +125,8 @@
                          <h2>1년간 지역별 추이</h2>
                      </div>
                      <div class="card-body" style="padding:0rem;">
-
+                        <div class="chart" id="time-graph">
+                        </div>
                      </div>
                  </div>
             </div>
@@ -142,6 +143,7 @@
     <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.0.0.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
         var width = 510,
             height = 400;
@@ -176,14 +178,17 @@
                         })
 
                     $.ajax({
-                        url:"{{ url_for('get_monthly_data') }}",
+                        url:"{{ url_for('draw_monthly_graph') }}",
                         type:"POST",
                         data:{
                             "name":name,
                             "search":"{{ search }}"
                         },
                         success:function(response){
-
+                            var graphs = JSON.parse(response);
+                            Plotly.purge('time-graph')
+                            Plotly.plot('time-graph',graphs,{});
+                            console.log(graphs)
                         }
                     })
 
