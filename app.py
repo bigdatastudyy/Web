@@ -99,7 +99,7 @@ def local():
 def create_plot(df):
 
     data = [
-        go.Scatter(
+        go.Bar(
             x=df['date'],
             y=df['total']
         )
